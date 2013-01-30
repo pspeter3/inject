@@ -193,6 +193,29 @@ var InjectCore;
        */
       enableDebug: function (key, value) {
         userConfig.debug[key] = value || true;
+      },
+
+      /**
+       * creates a shim for global objects on the page
+       * @method InjectCore.shim
+       * @param  {object} modules - An object with modules to be inserted
+       * @public
+       */
+      shim: function (modules) {
+        var wrap = function (func) { return func; };
+        for (var id in modules) {
+          var module = modules[id];
+          var deps = [];
+          var exports = module;
+          if (typeof module === 'object' && module.deps && module.exports) {
+            deps = module.deps;
+            exports = module.exports;
+          }
+          if (typeof exports === 'function') {
+            exports = wrap(exports);
+          }
+          define(id, deps, exports);
+        }
       }
     };
   });
